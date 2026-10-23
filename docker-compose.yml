@@ -1,0 +1,26 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DATABASE_URL: jdbc:postgresql://db:5432/shipments
+      DATABASE_USERNAME: shipments
+      DATABASE_PASSWORD: shipments
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shipments
+      POSTGRES_PASSWORD: shipments
+      POSTGRES_DB: shipments
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shipments"]
+      interval: 5s
+      retries: 10
